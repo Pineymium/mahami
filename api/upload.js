@@ -6,7 +6,6 @@ export const config = {
 
 export default async function handler(request) {
   try {
-    // Check if it's a POST request
     if (request.method !== 'POST') {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), {
         status: 405,
@@ -14,10 +13,9 @@ export default async function handler(request) {
       });
     }
 
-    // Get the file from the request
     const formData = await request.formData();
     const file = formData.get('file');
-
+    
     if (!file) {
       return new Response(JSON.stringify({ error: 'No file provided' }), {
         status: 400,
@@ -28,7 +26,7 @@ export default async function handler(request) {
     // Upload to Vercel Blob
     const blob = await put(file.name, file, {
       access: 'public',
-      addRandomSuffix: true, // Prevents overwriting files with same name
+      addRandomSuffix: true,
     });
 
     return new Response(JSON.stringify({ 
@@ -40,7 +38,6 @@ export default async function handler(request) {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
-
   } catch (error) {
     console.error('Upload error:', error);
     return new Response(JSON.stringify({ error: error.message }), {

@@ -1,3 +1,30 @@
+// ============================================
+// ADD YOUR FILES HERE - Edit this array weekly
+// ============================================
+const homeworkFiles = [
+    // Example files - replace with your own
+    {
+        url: 'https://via.placeholder.com/400x600/5D5CDE/ffffff?text=واجب+1',
+        subject: 'لغة عربية',
+        date: '2025-10-11',
+        fileName: 'homework-1.jpg'
+    },
+    {
+        url: 'https://via.placeholder.com/400x600/82ca9d/ffffff?text=واجب+2',
+        subject: 'رياضيات',
+        date: '2025-10-10',
+        fileName: 'homework-2.jpg'
+    },
+    // Add more files here each week like this:
+    // {
+    //     url: 'YOUR_IMAGE_URL_HERE',
+    //     subject: 'لغة عربية',
+    //     date: '2025-10-18',
+    //     fileName: 'homework-3.jpg'
+    // },
+];
+// ============================================
+
 // Initialize Lucide icons
 lucide.createIcons();
 
@@ -21,9 +48,6 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
     document.documentElement.classList.toggle('dark');
 });
 
-// Homework storage
-let homeworks = [];
-
 // Toast notification
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
@@ -37,91 +61,12 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Load homeworks from Vercel Blob
-async function loadHomeworks() {
-    try {
-        const response = await fetch('/api/files');
-        const data = await response.json();
-        
-        console.log('Loaded files:', data); // Debug log
-        
-        if (data.success && data.files) {
-            homeworks = data.files.map((file, index) => ({
-                id: index,
-                imageUrl: file.url,
-                subject: 'لغة عربية',
-                createdAt: file.uploadedAt,
-                fileName: file.pathname.split('/').pop() // Get just the filename
-            }));
-            renderHomeworks();
-            console.log('Rendered homeworks:', homeworks); // Debug log
-        }
-    } catch (error) {
-        console.error('Failed to load homeworks:', error);
-        showToast('فشل تحميل الواجبات', 'error');
-    }
-}
-
-// File upload handling
-async function handleFileUpload(file) {
-    if (!file) return;
-    
-    if (file.size > 10 * 1024 * 1024) {
-        showToast('حجم الملف كبير جداً (أكثر من 10MB)', 'error');
-        return;
-    }
-
-    showToast('جاري رفع الملف...', 'success');
-
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    file: e.target.result,
-                    fileName: file.name
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Upload failed');
-            }
-
-            const data = await response.json();
-            
-            if (data.success) {
-                homeworks.unshift({
-                    id: Date.now(),
-                    imageUrl: data.url,
-                    subject: document.getElementById('subject-select').value,
-                    createdAt: new Date().toISOString(),
-                    fileName: file.name
-                });
-                
-                renderHomeworks();
-                showToast('تم رفع الواجب بنجاح');
-            } else {
-                throw new Error(data.error || 'Upload failed');
-            }
-        } catch (error) {
-            console.error('Upload error:', error);
-            showToast('فشل رفع الملف', 'error');
-        }
-    };
-    
-    reader.readAsDataURL(file);
-}
-
 // Render homework cards
 function renderHomeworks() {
     const grid = document.getElementById('homework-grid');
     const emptyState = document.getElementById('empty-state');
     
-    if (homeworks.length === 0) {
+    if (homeworkFiles.length === 0) {
         grid.innerHTML = '';
         emptyState.classList.remove('hidden');
         return;
@@ -129,8 +74,13 @@ function renderHomeworks() {
     
     emptyState.classList.add('hidden');
     
-    grid.innerHTML = homeworks.map(homework => {
-        const date = new Date(homework.createdAt);
+    // Sort by date (newest first)
+    const sortedFiles = [...homeworkFiles].sort((a, b) => 
+        new Date(b.date) - new Date(a.date)
+    );
+    
+    grid.innerHTML = sortedFiles.map((homework, index) => {
+        const date = new Date(homework.date);
         const formattedDate = date.toLocaleDateString('ar-SA');
         const isImage = homework.fileName.match(/\.(jpg|jpeg|png|gif)$/i);
         
@@ -138,7 +88,7 @@ function renderHomeworks() {
             <div class="homework-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                 <div class="aspect-square bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                     ${isImage ? 
-                        `<img src="${homework.imageUrl}" alt="واجب" class="w-full h-full object-cover">` :
+                        `<img src="${homework.url}" alt="واجب" class="w-full h-full object-cover">` :
                         `<i data-lucide="file-text" class="w-16 h-16 text-gray-400"></i>`
                     }
                 </div>
@@ -152,12 +102,12 @@ function renderHomeworks() {
                     </div>
                     
                     <div class="flex gap-2">
-                        <button onclick="shareHomework('${homework.imageUrl}')" class="flex-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors flex items-center justify-center gap-2">
+                        <button onclick="shareHomework('${homework.url}')" class="flex-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors flex items-center justify-center gap-2">
                             <i data-lucide="share-2" class="w-4 h-4"></i>
                             مشاركة
                         </button>
                         
-                        <button onclick="downloadHomework('${homework.imageUrl}', '${homework.fileName}')" class="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2">
+                        <button onclick="downloadHomework('${homework.url}', '${homework.fileName}')" class="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2">
                             <i data-lucide="download" class="w-4 h-4"></i>
                             تحميل
                         </button>
@@ -206,43 +156,14 @@ function downloadHomework(url, fileName) {
     showToast('تم تحميل الواجب');
 }
 
-// Upload zone event listeners
-const uploadZone = document.getElementById('upload-zone');
-const fileInput = document.getElementById('file-input');
-const uploadBtn = document.getElementById('upload-btn');
-
-uploadZone.addEventListener('click', () => fileInput.click());
-uploadBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    fileInput.click();
-});
-
-uploadZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    uploadZone.classList.add('border-primary', 'bg-primary/5');
-});
-
-uploadZone.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    uploadZone.classList.remove('border-primary', 'bg-primary/5');
-});
-
-uploadZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    uploadZone.classList.remove('border-primary', 'bg-primary/5');
-    
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        handleFileUpload(files[0]);
-    }
-});
-
-fileInput.addEventListener('change', (e) => {
-    if (e.target.files.length > 0) {
-        handleFileUpload(e.target.files[0]);
+// Hide upload section since we're not using it
+document.addEventListener('DOMContentLoaded', () => {
+    const uploadSection = document.querySelector('section.px-4.mb-16.fade-in');
+    if (uploadSection) {
+        uploadSection.style.display = 'none';
     }
 });
 
 // Initialize app
 initDarkMode();
-loadHomeworks();
+renderHomeworks();

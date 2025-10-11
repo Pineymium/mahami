@@ -1,3 +1,29 @@
+// Initialize Lucide icons
+lucide.createIcons();
+
+// Dark mode functionality
+function initDarkMode() {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+    }
+    
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        if (event.matches) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    });
+}
+
+// Theme toggle
+document.getElementById('theme-toggle').addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark');
+});
+
+// Homework storage
+let homeworks = [];
+
 // Toast notification
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
@@ -17,15 +43,18 @@ async function loadHomeworks() {
         const response = await fetch('/api/files');
         const data = await response.json();
         
+        console.log('Loaded files:', data); // Debug log
+        
         if (data.success && data.files) {
             homeworks = data.files.map((file, index) => ({
                 id: index,
                 imageUrl: file.url,
                 subject: 'لغة عربية',
                 createdAt: file.uploadedAt,
-                fileName: file.pathname
+                fileName: file.pathname.split('/').pop() // Get just the filename
             }));
             renderHomeworks();
+            console.log('Rendered homeworks:', homeworks); // Debug log
         }
     } catch (error) {
         console.error('Failed to load homeworks:', error);
@@ -44,39 +73,47 @@ async function handleFileUpload(file) {
 
     showToast('جاري رفع الملف...', 'success');
 
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error('Upload failed');
-        }
-
-        const data = await response.json();
-        
-        if (data.success) {
-            homeworks.unshift({
-                id: Date.now(),
-                imageUrl: data.url,
-                subject: document.getElementById('subject-select').value,
-                createdAt: new Date().toISOString(),
-                fileName: file.name
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    file: e.target.result,
+                    fileName: file.name
+                })
             });
+
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+
+            const data = await response.json();
             
-            renderHomeworks();
-            showToast('تم رفع الواجب بنجاح');
-        } else {
-            throw new Error(data.error || 'Upload failed');
+            if (data.success) {
+                homeworks.unshift({
+                    id: Date.now(),
+                    imageUrl: data.url,
+                    subject: document.getElementById('subject-select').value,
+                    createdAt: new Date().toISOString(),
+                    fileName: file.name
+                });
+                
+                renderHomeworks();
+                showToast('تم رفع الواجب بنجاح');
+            } else {
+                throw new Error(data.error || 'Upload failed');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast('فشل رفع الملف', 'error');
         }
-    } catch (error) {
-        console.error('Upload error:', error);
-        showToast('فشل رفع الملف', 'error');
-    }
+    };
+    
+    reader.readAsDataURL(file);
 }
 
 // Render homework cards

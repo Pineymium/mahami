@@ -94,6 +94,24 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        .modal-overlay {
+            animation: fadeInOverlay 0.3s ease-out;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-white dark:bg-gray-900 font-display">
@@ -215,6 +233,17 @@
         </div>
     </footer>
 
+    <!-- Image Modal -->
+    <div id="image-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="modal-content relative z-10 max-w-5xl max-h-[90vh] w-full">
+            <button onclick="closeModal()" class="absolute -top-12 left-0 text-white hover:text-gray-300 transition-colors">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+            <img id="modal-image" src="" alt="عرض الواجب" class="w-full h-full object-contain rounded-lg shadow-2xl">
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toast-container" class="fixed top-4 left-4 z-50 space-y-2"></div>
 
@@ -240,6 +269,34 @@
         // Theme toggle
         document.getElementById('theme-toggle').addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
+        });
+
+        // Modal functions
+        function viewHomework(id) {
+            const homework = homeworks.find(hw => hw.id === id);
+            if (homework) {
+                const modal = document.getElementById('image-modal');
+                const modalImage = document.getElementById('modal-image');
+                modalImage.src = homework.imageUrl;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+                lucide.createIcons();
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('image-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
         });
 
         // ===== HARDCODED IMAGES - ADD YOUR IMAGES HERE! =====
@@ -339,7 +396,11 @@
                             </div>
                             
                             <div class="flex gap-2">
-                                <button onclick="downloadHomework(${homework.id})" class="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2">
+                                <button onclick="viewHomework(${homework.id})" class="flex-1 bg-primary text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors flex items-center justify-center gap-2">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                    عرض
+                                </button>
+                                <button onclick="downloadHomework(${homework.id})" class="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2">
                                     <i data-lucide="download" class="w-4 h-4"></i>
                                     تحميل
                                 </button>

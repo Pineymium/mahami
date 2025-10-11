@@ -241,9 +241,26 @@
             document.documentElement.classList.toggle('dark');
         });
 
-        // Homework storage (in-memory since localStorage isn't available)
-        let homeworks = [];
-        let nextId = 1;
+        // ===== HARDCODED IMAGES - ADD YOUR IMAGES HERE! =====
+        let homeworks = [
+            // Add your images like this:
+            // {
+            //     id: 1,
+            //     imageUrl: 'images/homework1.jpg',
+            //     subject: 'لغة عربية',
+            //     createdAt: '2025-10-11',
+            //     fileName: 'homework1.jpg'
+            // },
+            // {
+            //     id: 2,
+            //     imageUrl: 'images/homework2.jpg',
+            //     subject: 'رياضيات',
+            //     createdAt: '2025-10-12',
+            //     fileName: 'homework2.jpg'
+            // },
+        ];
+
+        let nextId = homeworks.length + 1;
 
         // Toast notification
         function showToast(message, type = 'success') {

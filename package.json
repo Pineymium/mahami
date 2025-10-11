@@ -1,8 +1,0 @@
-{
-  "name": "mahami-file-sharing",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "@vercel/blob": "^0.23.4"
-  }
-}

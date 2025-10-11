@@ -236,11 +236,11 @@
     <!-- Image Modal -->
     <div id="image-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
         <div class="modal-overlay absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal()"></div>
-        <div class="modal-content relative z-10 max-w-5xl max-h-[90vh] w-full">
-            <button onclick="closeModal()" class="absolute -top-12 left-0 text-white hover:text-gray-300 transition-colors">
-                <i data-lucide="x" class="w-8 h-8"></i>
+        <div class="modal-content relative z-10 w-full h-full flex items-center justify-center">
+            <button onclick="closeModal()" class="absolute top-4 left-4 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2">
+                <i data-lucide="x" class="w-6 h-6"></i>
             </button>
-            <img id="modal-image" src="" alt="عرض الواجب" class="w-full h-full object-contain rounded-lg shadow-2xl">
+            <img id="modal-image" src="" alt="عرض الواجب" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl">
         </div>
     </div>
 

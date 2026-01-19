@@ -305,21 +305,21 @@
         let homeworks = [
              {
                  id: 1,
-                 imageUrl: 'https://via.placeholder.com/400x400/5D5CDE/FFFFFF?text=QOTBA',
+                 imageUrl: 'images/QOTBA.png',
                  subject: 'لغتي الخالدة',
                  createdAt: '2025-01-11',
                  fileName: 'QOTBA.png'
              },
               {
                  id: 2,
-                 imageUrl: 'https://via.placeholder.com/400x400/82ca9d/FFFFFF?text=HQ',
+                 imageUrl: 'images/HQ.png',
                  subject: 'لغتي الخالدة',
                  createdAt: '2025-01-11',
                  fileName: 'HQ.png'
              },
               {
                  id: 3,
-                 imageUrl: 'https://via.placeholder.com/400x400/ffc658/FFFFFF?text=Ibn+Baz',
+                 imageUrl: 'images/bn baz.png',
                  subject: 'لغتي الخالدة',
                  createdAt: '2025-01-13',
                  fileName: 'bn baz.png'
@@ -390,7 +390,7 @@
                     <div class="homework-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                         <div class="aspect-square bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                             ${isImage ? 
-                                `<img src="${homework.imageUrl}" alt="مهمة أدائية" class="w-full h-full object-cover">` :
+                                `<img src="${homework.imageUrl}" alt="عمل الطالب" class="w-full h-full object-cover">` :
                                 `<i data-lucide="file-text" class="w-16 h-16 text-gray-400"></i>`
                             }
                         </div>
